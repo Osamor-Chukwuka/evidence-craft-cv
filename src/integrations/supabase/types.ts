@@ -14,7 +14,337 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      achievements: {
+        Row: {
+          bullet: string
+          category: string | null
+          confidence: number | null
+          created_at: string
+          evidence: Json
+          id: string
+          impact: string | null
+          included: boolean
+          model: string | null
+          period_end: string | null
+          period_start: string | null
+          provider: string | null
+          repository_id: string | null
+          skills: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bullet: string
+          category?: string | null
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          impact?: string | null
+          included?: boolean
+          model?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          repository_id?: string | null
+          skills?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bullet?: string
+          category?: string | null
+          confidence?: number | null
+          created_at?: string
+          evidence?: Json
+          id?: string
+          impact?: string | null
+          included?: boolean
+          model?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          provider?: string | null
+          repository_id?: string | null
+          skills?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "achievements_repository_id_fkey"
+            columns: ["repository_id"]
+            isOneToOne: false
+            referencedRelation: "repositories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contributions: {
+        Row: {
+          additions: number
+          body: string | null
+          created_at: string
+          deletions: number
+          external_id: string
+          files_changed: number
+          id: string
+          kind: string
+          occurred_at: string
+          repository_id: string
+          title: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          additions?: number
+          body?: string | null
+          created_at?: string
+          deletions?: number
+          external_id: string
+          files_changed?: number
+          id?: string
+          kind: string
+          occurred_at: string
+          repository_id: string
+          title: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          additions?: number
+          body?: string | null
+          created_at?: string
+          deletions?: number
+          external_id?: string
+          files_changed?: number
+          id?: string
+          kind?: string
+          occurred_at?: string
+          repository_id?: string
+          title?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contributions_repository_id_fkey"
+            columns: ["repository_id"]
+            isOneToOne: false
+            referencedRelation: "repositories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cvs: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          model: string | null
+          provider: string | null
+          summary: string | null
+          target_role: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          model?: string | null
+          provider?: string | null
+          summary?: string | null
+          target_role?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          model?: string | null
+          provider?: string | null
+          summary?: string | null
+          target_role?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      github_connections: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          github_login: string
+          github_name: string | null
+          scopes: string | null
+          token_ciphertext: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          github_login: string
+          github_name?: string | null
+          scopes?: string | null
+          token_ciphertext: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          github_login?: string
+          github_name?: string | null
+          scopes?: string | null
+          token_ciphertext?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          headline: string | null
+          id: string
+          linkedin: string | null
+          location: string | null
+          target_role: string | null
+          updated_at: string
+          website: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          headline?: string | null
+          id: string
+          linkedin?: string | null
+          location?: string | null
+          target_role?: string | null
+          updated_at?: string
+          website?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          headline?: string | null
+          id?: string
+          linkedin?: string | null
+          location?: string | null
+          target_role?: string | null
+          updated_at?: string
+          website?: string | null
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
+      repositories: {
+        Row: {
+          created_at: string
+          description: string | null
+          full_name: string
+          github_id: number
+          id: string
+          is_fork: boolean
+          is_private: boolean
+          last_synced_at: string | null
+          name: string
+          primary_language: string | null
+          pushed_at: string | null
+          selected: boolean
+          stars: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          full_name: string
+          github_id: number
+          id?: string
+          is_fork?: boolean
+          is_private?: boolean
+          last_synced_at?: string | null
+          name: string
+          primary_language?: string | null
+          pushed_at?: string | null
+          selected?: boolean
+          stars?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          full_name?: string
+          github_id?: number
+          id?: string
+          is_fork?: boolean
+          is_private?: boolean
+          last_synced_at?: string | null
+          name?: string
+          primary_language?: string | null
+          pushed_at?: string | null
+          selected?: boolean
+          stars?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sync_runs: {
+        Row: {
+          commits_count: number
+          created_at: string
+          error: string | null
+          id: string
+          period_end: string | null
+          period_start: string | null
+          prs_count: number
+          repos_count: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          commits_count?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          prs_count?: number
+          repos_count?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          commits_count?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          period_end?: string | null
+          period_start?: string | null
+          prs_count?: number
+          repos_count?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
