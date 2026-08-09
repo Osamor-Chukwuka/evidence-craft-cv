@@ -56,7 +56,8 @@ export const startGithubOAuth = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const clientId = process.env["GITHUB_CLIENT_ID"];
     if (!clientId) throw new Error("GitHub OAuth is not configured");
-    const state = `${context.userId}.${crypto.randomUUID()}`;
+    const { signState } = await import("@/server/crypto.server");
+    const state = signState(context.userId);
     const redirectUri = `${data.origin}/api/public/github/callback`;
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent("read:user repo")}&state=${encodeURIComponent(state)}`;
     return { url };
