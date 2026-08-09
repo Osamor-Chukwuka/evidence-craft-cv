@@ -125,7 +125,7 @@ export async function runSync(userId: string, from: string, to: string) {
           repository_id: repo.id,
           kind: "commit" as const,
           external_id: commit.sha,
-          title: commit.message.split("\n")[0].slice(0, 300),
+          title: (commit.message.split("\n")[0] ?? commit.message).slice(0, 300),
           body: [commit.message, stats.filenames.join(", ")].filter(Boolean).join("\n\nFiles: "),
           url: commit.url,
           files_changed: stats.files,
