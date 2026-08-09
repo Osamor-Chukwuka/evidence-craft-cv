@@ -171,7 +171,7 @@ function AchievementsPage() {
                       update(item.id, {
                         bullet: editing[item.id] ?? item.bullet,
                         included: true,
-                        reviewed: true,
+
                       })
                     }
                   >
@@ -180,7 +180,7 @@ function AchievementsPage() {
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={() => update(item.id, { included: false, reviewed: true })}
+                    onClick={() => update(item.id, { included: false })}
                   >
                     <X className="mr-2 h-3.5 w-3.5" /> Reject
                   </Button>
