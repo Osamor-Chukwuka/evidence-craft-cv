@@ -82,7 +82,7 @@ ${evidence}`,
       title,
       target_role: targetRole,
       summary: result.data.summary ?? null,
-      content: result.data as unknown as Record<string, unknown>,
+      content: JSON.parse(JSON.stringify(result.data)),
       model: result.model,
       provider: result.provider,
     })
