@@ -142,3 +142,63 @@
     color: var(--color-foreground);
   }
 }
+
+/* ── Commit Trail design system ───────────────────────────────────────────
+   Terminal-inspired, dark-first. Deep graphite surfaces, signal-green accent,
+   amber for evidence highlights. All colors are tokens; never hardcode. */
+:root {
+  --radius: 0.5rem;
+  --background: oklch(0.17 0.012 250);
+  --foreground: oklch(0.95 0.008 250);
+  --card: oklch(0.21 0.014 252);
+  --card-foreground: oklch(0.95 0.008 250);
+  --popover: oklch(0.21 0.014 252);
+  --popover-foreground: oklch(0.95 0.008 250);
+  --primary: oklch(0.79 0.18 150);
+  --primary-foreground: oklch(0.18 0.03 155);
+  --secondary: oklch(0.27 0.016 252);
+  --secondary-foreground: oklch(0.94 0.008 250);
+  --muted: oklch(0.25 0.014 252);
+  --muted-foreground: oklch(0.72 0.02 250);
+  --accent: oklch(0.8 0.15 82);
+  --accent-foreground: oklch(0.2 0.03 82);
+  --destructive: oklch(0.63 0.21 25);
+  --destructive-foreground: oklch(0.97 0.01 25);
+  --border: oklch(0.32 0.016 252);
+  --input: oklch(0.3 0.016 252);
+  --ring: oklch(0.79 0.18 150);
+  --chart-1: oklch(0.79 0.18 150);
+  --chart-2: oklch(0.8 0.15 82);
+  --chart-3: oklch(0.68 0.14 240);
+  --chart-4: oklch(0.7 0.17 320);
+  --chart-5: oklch(0.75 0.13 200);
+  --sidebar: oklch(0.19 0.013 252);
+  --sidebar-foreground: oklch(0.93 0.008 250);
+  --sidebar-primary: oklch(0.79 0.18 150);
+  --sidebar-primary-foreground: oklch(0.18 0.03 155);
+  --sidebar-accent: oklch(0.26 0.016 252);
+  --sidebar-accent-foreground: oklch(0.94 0.008 250);
+  --sidebar-border: oklch(0.3 0.016 252);
+  --sidebar-ring: oklch(0.79 0.18 150);
+}
+
+@layer base {
+  body {
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+  code, pre, .font-mono {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+}
+
+@utility grid-backdrop {
+  background-image:
+    linear-gradient(oklch(1 0 0 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 4%) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
