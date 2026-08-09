@@ -73,7 +73,7 @@ function AchievementsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const update = async (id: string, patch: { bullet?: string; included?: boolean; reviewed?: boolean }) => {
+  const update = async (id: string, patch: { bullet?: string; included?: boolean }) => {
     const { error } = await supabase.from("achievements").update(patch).eq("id", id);
     if (error) {
       toast.error(error.message);
