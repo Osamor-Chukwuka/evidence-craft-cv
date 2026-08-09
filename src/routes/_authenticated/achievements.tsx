@@ -31,6 +31,10 @@ export const Route = createFileRoute("/_authenticated/achievements")({
   component: AchievementsPage,
 });
 
+function asArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}
+
 function AchievementsPage() {
   const qc = useQueryClient();
   const analyze = useServerFn(analyzeRepo);
@@ -69,7 +73,7 @@ function AchievementsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const update = async (id: string, patch: Record<string, unknown>) => {
+  const update = async (id: string, patch: { bullet?: string; included?: boolean; reviewed?: boolean }) => {
     const { error } = await supabase.from("achievements").update(patch).eq("id", id);
     if (error) {
       toast.error(error.message);
@@ -136,18 +140,18 @@ function AchievementsPage() {
                   onChange={(e) => setEditing((s) => ({ ...s, [item.id]: e.target.value }))}
                   rows={3}
                 />
-                {(item.skills ?? []).length ? (
+                {asArray(item.skills).length ? (
                   <div className="flex flex-wrap gap-1.5">
-                    {(item.skills ?? []).map((skill: string) => (
+                    {asArray(item.skills).map((skill) => (
                       <Badge key={skill} variant="secondary" className="text-[10px]">
                         {skill}
                       </Badge>
                     ))}
                   </div>
                 ) : null}
-                {(item.evidence ?? []).length ? (
+                {asArray(item.evidence).length ? (
                   <div className="flex flex-wrap gap-2 text-xs">
-                    {(item.evidence ?? []).map((url: string, i: number) => (
+                    {asArray(item.evidence).map((url, i) => (
                       <a
                         key={url}
                         href={url}
