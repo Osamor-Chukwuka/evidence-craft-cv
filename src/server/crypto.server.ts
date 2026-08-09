@@ -22,3 +22,22 @@ export function decryptToken(stored: string): string {
   decipher.setAuthTag(tag);
   return Buffer.concat([decipher.update(ct), decipher.final()]).toString("utf8");
 }
+
+export function signState(userId: string): string {
+  const payload = `${userId}.${randomBytes(8).toString("hex")}.${Date.now()}`;
+  const mac = createHash("sha256").update(`${payload}${process.env["GITHUB_TOKEN_ENC_KEY"]}`).digest("hex");
+  return `${Buffer.from(payload).toString("base64url")}.${mac}`;
+}
+
+export function verifyState(state: string): string {
+  const [encoded, mac] = state.split(".");
+  if (!encoded || !mac) throw new Error("Invalid OAuth state");
+  const payload = Buffer.from(encoded, "base64url").toString("utf8");
+  const expected = createHash("sha256").update(`${payload}${process.env["GITHUB_TOKEN_ENC_KEY"]}`).digest("hex");
+  if (expected !== mac) throw new Error("Invalid OAuth state");
+  const [userId, , issued] = payload.split(".");
+  if (!userId || !issued || Date.now() - Number(issued) > 15 * 60 * 1000) {
+    throw new Error("Expired OAuth state");
+  }
+  return userId;
+}
