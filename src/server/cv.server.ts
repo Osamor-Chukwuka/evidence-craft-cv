@@ -5,18 +5,7 @@ async function admin() {
   return supabaseAdmin;
 }
 
-export type CvContent = {
-  headline: string;
-  summary: string;
-  skills: { category: string; items: string[] }[];
-  experience: {
-    title: string;
-    context: string;
-    period: string;
-    bullets: string[];
-  }[];
-  projects: { name: string; description: string; bullets: string[]; url?: string }[];
-};
+import type { CvContent } from "./cv.types";
 
 const SYSTEM = `You are an expert technical CV writer for software engineers.
 You receive verified achievements recovered from a developer's real git history plus their profile.
