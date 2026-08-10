@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedAchievementsRouteImport } from './routes/_authenticated/achievements'
 import { Route as AuthenticatedCvRouteImport } from './routes/_authenticated/cv'
+import { Route as AuthenticatedCvReviewRouteImport } from './routes/_authenticated/cv-review'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedRepositoriesRouteImport } from './routes/_authenticated/repositories'
 import { Route as ApiPublicGithubCallbackRouteImport } from './routes/api/public/github/callback'
@@ -43,6 +44,11 @@ const AuthenticatedCvRoute = AuthenticatedCvRouteImport.update({
   path: '/cv',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCvReviewRoute = AuthenticatedCvReviewRouteImport.update({
+  id: '/cv-review',
+  path: '/cv-review',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/cv': typeof AuthenticatedCvRoute
+  '/cv-review': typeof AuthenticatedCvReviewRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/repositories': typeof AuthenticatedRepositoriesRoute
   '/api/public/github/callback': typeof ApiPublicGithubCallbackRoute
@@ -74,6 +81,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/achievements': typeof AuthenticatedAchievementsRoute
   '/cv': typeof AuthenticatedCvRoute
+  '/cv-review': typeof AuthenticatedCvReviewRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/repositories': typeof AuthenticatedRepositoriesRoute
   '/api/public/github/callback': typeof ApiPublicGithubCallbackRoute
@@ -85,6 +93,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/achievements': typeof AuthenticatedAchievementsRoute
   '/_authenticated/cv': typeof AuthenticatedCvRoute
+  '/_authenticated/cv-review': typeof AuthenticatedCvReviewRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/repositories': typeof AuthenticatedRepositoriesRoute
   '/api/public/github/callback': typeof ApiPublicGithubCallbackRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/achievements'
     | '/cv'
+    | '/cv-review'
     | '/dashboard'
     | '/repositories'
     | '/api/public/github/callback'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/achievements'
     | '/cv'
+    | '/cv-review'
     | '/dashboard'
     | '/repositories'
     | '/api/public/github/callback'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/achievements'
     | '/_authenticated/cv'
+    | '/_authenticated/cv-review'
     | '/_authenticated/dashboard'
     | '/_authenticated/repositories'
     | '/api/public/github/callback'
@@ -164,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCvRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cv-review': {
+      id: '/_authenticated/cv-review'
+      path: '/cv-review'
+      fullPath: '/cv-review'
+      preLoaderRoute: typeof AuthenticatedCvReviewRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -191,6 +210,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAchievementsRoute: typeof AuthenticatedAchievementsRoute
   AuthenticatedCvRoute: typeof AuthenticatedCvRoute
+  AuthenticatedCvReviewRoute: typeof AuthenticatedCvReviewRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedRepositoriesRoute: typeof AuthenticatedRepositoriesRoute
 }
@@ -198,6 +218,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAchievementsRoute: AuthenticatedAchievementsRoute,
   AuthenticatedCvRoute: AuthenticatedCvRoute,
+  AuthenticatedCvReviewRoute: AuthenticatedCvReviewRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedRepositoriesRoute: AuthenticatedRepositoriesRoute,
 }
