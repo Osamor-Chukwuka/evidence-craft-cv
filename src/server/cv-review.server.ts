@@ -24,7 +24,7 @@ Reply with JSON only, in this exact shape:
 
 export async function parseCvUpload(
   userId: string,
-  input: { fileName: string; mimeType: string; text?: string; fileData?: string },
+  input: { fileName: string; mimeType: string; text?: string | undefined; fileData?: string | undefined },
 ) {
   const userContent: ContentBlock[] = input.text
     ? [{ type: "text", text: `CV file: ${input.fileName}\n\n${input.text.slice(0, 120000)}` }]
