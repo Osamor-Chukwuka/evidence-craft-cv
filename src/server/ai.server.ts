@@ -1,4 +1,9 @@
-type ChatMessage = { role: "system" | "user"; content: string };
+export type ContentBlock =
+  | { type: "text"; text: string }
+  | { type: "file"; file: { filename: string; file_data: string } };
+
+type ChatMessage = { role: "system" | "user"; content: string | ContentBlock[] };
+
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 

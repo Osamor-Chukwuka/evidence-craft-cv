@@ -1,5 +1,13 @@
 import { Link, useRouter } from "@tanstack/react-router";
-import { GitBranch, LayoutDashboard, FileText, Sparkles, FolderGit2, LogOut } from "lucide-react";
+import {
+  GitBranch,
+  LayoutDashboard,
+  FileText,
+  Sparkles,
+  FolderGit2,
+  LogOut,
+  ScanSearch,
+} from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,8 +17,10 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/repositories", label: "Repositories", icon: FolderGit2 },
   { to: "/achievements", label: "Work items", icon: Sparkles },
+  { to: "/cv-review", label: "CV review", icon: ScanSearch },
   { to: "/cv", label: "CV", icon: FileText },
 ] as const;
+
 
 export function AppShell({
   title,
