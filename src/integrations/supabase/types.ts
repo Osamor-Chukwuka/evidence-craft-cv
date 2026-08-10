@@ -138,6 +138,120 @@ export type Database = {
           },
         ]
       }
+      cv_gaps: {
+        Row: {
+          achievement_id: string | null
+          confidence: number | null
+          created_at: string
+          cv_excerpt: string | null
+          evidence: Json
+          id: string
+          issue: string
+          kind: string
+          model: string | null
+          provider: string | null
+          section: string | null
+          skills: string[]
+          status: string
+          suggestion: string
+          updated_at: string
+          upload_id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          cv_excerpt?: string | null
+          evidence?: Json
+          id?: string
+          issue: string
+          kind?: string
+          model?: string | null
+          provider?: string | null
+          section?: string | null
+          skills?: string[]
+          status?: string
+          suggestion: string
+          updated_at?: string
+          upload_id: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string | null
+          confidence?: number | null
+          created_at?: string
+          cv_excerpt?: string | null
+          evidence?: Json
+          id?: string
+          issue?: string
+          kind?: string
+          model?: string | null
+          provider?: string | null
+          section?: string | null
+          skills?: string[]
+          status?: string
+          suggestion?: string
+          updated_at?: string
+          upload_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cv_gaps_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cv_gaps_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "cv_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cv_uploads: {
+        Row: {
+          created_at: string
+          file_name: string
+          id: string
+          mime_type: string | null
+          model: string | null
+          parsed: Json
+          provider: string | null
+          source_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          model?: string | null
+          parsed?: Json
+          provider?: string | null
+          source_text?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          model?: string | null
+          parsed?: Json
+          provider?: string | null
+          source_text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cvs: {
         Row: {
           content: Json
