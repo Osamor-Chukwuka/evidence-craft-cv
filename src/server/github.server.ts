@@ -78,16 +78,20 @@ export async function listCommits(
 ): Promise<CommitSummary[]> {
   const out: CommitSummary[] = [];
   for (let page = 1; page <= maxPages; page++) {
-    const batch = await gh<
-      Array<{
-        sha: string;
-        html_url: string;
-        commit: { message: string; author: { date: string } | null };
-      }>
-    >(
-      token,
-      `/repos/${fullName}/commits?author=${encodeURIComponent(author)}&since=${since}&until=${until}&per_page=100&page=${page}`,
-    );
+    let batch: Array<{
+      sha: string;
+      html_url: string;
+      commit: { message: string; author: { date: string } | null };
+    }> = [];
+    try {
+      batch = await gh<typeof batch>(
+        token,
+        `/repos/${fullName}/commits?author=${encodeURIComponent(author)}&since=${since}&until=${until}&per_page=100&page=${page}`,
+      );
+    } catch (error) {
+      if (isSkippableRepoError(error)) return out;
+      throw error;
+    }
     out.push(
       ...batch.map((c) => ({
         sha: c.sha,
