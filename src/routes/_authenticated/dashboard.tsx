@@ -1,26 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, GitCommitHorizontal, GitPullRequest, Sparkles } from "lucide-react";
+import { ArrowRight, Check, GitCommitHorizontal, GitPullRequest } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useJourney } from "@/hooks/useJourney";
 import { supabase } from "@/integrations/supabase/client";
-import { getGithubStatus } from "@/lib/github.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Commit Trail" },
+      { title: "Overview — Commit Trail" },
       {
         name: "description",
-        content: "See your synced GitHub activity, generated work items, and CV progress.",
+        content:
+          "Follow four guided steps: sync GitHub, review work items, compare your CV, generate an evidence-backed CV.",
       },
-      { property: "og:title", content: "Dashboard — Commit Trail" },
-      { property: "og:description", content: "Your synced engineering work at a glance." },
+      { property: "og:title", content: "Overview — Commit Trail" },
+      { property: "og:description", content: "Your guided path from commits to a credible CV." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -29,80 +30,90 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function Dashboard() {
-  const status = useServerFn(getGithubStatus);
+  const { steps, current, counts, isLoading } = useJourney();
 
-  const github = useQuery({ queryKey: ["github-status"], queryFn: () => status({}) });
-
-  const stats = useQuery({
-    queryKey: ["dashboard-stats"],
+  const recent = useQuery({
+    queryKey: ["recent-contributions"],
     queryFn: async () => {
-      const [repos, commits, prs, achievements, cvs, recent] = await Promise.all([
-        supabase.from("repositories").select("id", { count: "exact", head: true }).eq("selected", true),
-        supabase.from("contributions").select("id", { count: "exact", head: true }).eq("kind", "commit"),
-        supabase
-          .from("contributions")
-          .select("id", { count: "exact", head: true })
-          .eq("kind", "pull_request"),
-        supabase.from("achievements").select("id", { count: "exact", head: true }),
-        supabase.from("cvs").select("id", { count: "exact", head: true }),
-        supabase
-          .from("contributions")
-          .select("id, kind, title, url, occurred_at, additions, deletions")
-          .order("occurred_at", { ascending: false })
-          .limit(8),
-      ]);
-      return {
-        repos: repos.count ?? 0,
-        commits: commits.count ?? 0,
-        prs: prs.count ?? 0,
-        achievements: achievements.count ?? 0,
-        cvs: cvs.count ?? 0,
-        recent: recent.data ?? [],
-      };
+      const { data } = await supabase
+        .from("contributions")
+        .select("id, kind, title, url, occurred_at, additions, deletions")
+        .order("occurred_at", { ascending: false })
+        .limit(6);
+      return data ?? [];
     },
   });
 
   return (
     <AppShell
-      title="Dashboard"
-      description="Everything below is derived from your real GitHub history — nothing is invented."
+      title="Turn your commits into a credible CV"
+      description="Four steps. Everything you see comes from your real GitHub history — nothing is invented."
       actions={
-        <Button asChild>
-          <Link to="/repositories">
-            Sync work <ArrowRight className="ml-2 h-4 w-4" />
+        <Button asChild size="lg">
+          <Link to={current.to}>
+            Continue: {current.label} <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       }
     >
-      {!github.isLoading && !github.data?.connected ? (
-        <Card className="mb-8 border-primary/40 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-lg">Connect GitHub to get started</CardTitle>
-            <CardDescription>
-              Commit Trail reads your commits and merged pull requests to reconstruct what you
-              actually built.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button asChild>
-              <Link to="/repositories">Connect GitHub</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      ) : null}
+      <div className="grid gap-4 md:grid-cols-2">
+        {steps.map((s) => {
+          const isCurrent = s.id === current.id;
+          return (
+            <Card
+              key={s.id}
+              className={cn(
+                "transition-colors",
+                isCurrent && "border-primary/60 bg-primary/5",
+                s.done && !isCurrent && "opacity-80",
+              )}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-start gap-3">
+                  <span
+                    className={cn(
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border font-mono text-xs",
+                      s.done
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : isCurrent
+                          ? "border-primary text-primary"
+                          : "border-border text-muted-foreground",
+                    )}
+                  >
+                    {s.done ? <Check className="h-4 w-4" /> : s.step}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base">{s.label}</CardTitle>
+                    <CardDescription className="mt-1">{s.hint}</CardDescription>
+                  </div>
+                  {isLoading ? null : (
+                    <Badge variant="secondary" className="shrink-0 font-mono text-[10px]">
+                      {s.count}
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant={isCurrent ? "default" : "secondary"} size="sm">
+                  <Link to={s.to}>{s.done ? "Open" : "Start"}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Repositories", value: stats.data?.repos },
-          { label: "Commits", value: stats.data?.commits },
-          { label: "Merged PRs", value: stats.data?.prs },
-          { label: "Work items", value: stats.data?.achievements },
-          { label: "CVs", value: stats.data?.cvs },
+          { label: "Repositories synced", value: counts?.repos },
+          { label: "Contributions", value: counts?.contributions },
+          { label: "Approved work items", value: counts?.approved },
+          { label: "CVs generated", value: counts?.cvs },
         ].map((item) => (
           <Card key={item.label}>
             <CardContent className="pt-6">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">{item.label}</p>
-              {stats.isLoading ? (
+              {isLoading ? (
                 <Skeleton className="mt-2 h-8 w-14" />
               ) : (
                 <p className="mt-1 font-mono text-3xl font-semibold">{item.value ?? 0}</p>
@@ -118,10 +129,10 @@ function Dashboard() {
           <CardDescription>The latest contributions pulled from your selected repos.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">
-          {stats.isLoading ? (
+          {recent.isLoading ? (
             <Skeleton className="h-24 w-full" />
-          ) : stats.data?.recent.length ? (
-            stats.data.recent.map((item) => (
+          ) : recent.data?.length ? (
+            recent.data.map((item) => (
               <a
                 key={item.id}
                 href={item.url ?? "#"}
@@ -147,21 +158,9 @@ function Dashboard() {
             ))
           ) : (
             <p className="py-6 text-center text-sm text-muted-foreground">
-              No contributions synced yet.
+              Nothing synced yet — start with step 1.
             </p>
           )}
-        </CardContent>
-      </Card>
-
-      <Card className="mt-6 border-dashed">
-        <CardContent className="flex flex-wrap items-center gap-4 pt-6">
-          <Sparkles className="h-5 w-5 text-accent" />
-          <p className="flex-1 text-sm text-muted-foreground">
-            Once your work is synced, generate work items and turn the ones you approve into a CV.
-          </p>
-          <Button variant="secondary" asChild>
-            <Link to="/achievements">Review work items</Link>
-          </Button>
         </CardContent>
       </Card>
     </AppShell>
