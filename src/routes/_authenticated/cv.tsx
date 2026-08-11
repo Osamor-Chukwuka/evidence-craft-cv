@@ -64,7 +64,7 @@ function CvPage() {
 
   return (
     <AppShell
-      title="Internal CV"
+      title="Step 4 · Your CV"
       description="Built only from approved work items. Every bullet traces back to a commit or merged PR."
     >
       <Card className="mb-8">

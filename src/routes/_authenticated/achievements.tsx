@@ -87,12 +87,12 @@ function AchievementsPage() {
 
   return (
     <AppShell
-      title="Work items"
+      title="Step 2 · Review work items"
       description="Each item is clustered from real commits and merged PRs. Approve what is accurate, edit what is not."
     >
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-lg">Discover work</CardTitle>
+          <CardTitle className="text-lg">2a · Discover work</CardTitle>
           <CardDescription>Analyze a synced repository to recover its achievements.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
