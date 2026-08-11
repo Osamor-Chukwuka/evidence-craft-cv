@@ -137,10 +137,16 @@ export async function listMergedPulls(
   until: string,
 ): Promise<PullSummary[]> {
   const q = `repo:${fullName}+type:pr+author:${author}+merged:${since.slice(0, 10)}..${until.slice(0, 10)}`;
-  const search = await gh<{ items: Array<{ number: number }> }>(
-    token,
-    `/search/issues?q=${q}&per_page=50`,
-  );
+  let search: { items: Array<{ number: number }> } = { items: [] };
+  try {
+    search = await gh<{ items: Array<{ number: number }> }>(
+      token,
+      `/search/issues?q=${q}&per_page=50`,
+    );
+  } catch (error) {
+    if (isSkippableRepoError(error)) return [];
+    throw error;
+  }
   const results: PullSummary[] = [];
   for (const item of search.items.slice(0, 30)) {
     try {
