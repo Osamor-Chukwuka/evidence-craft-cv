@@ -115,7 +115,12 @@ function RepositoriesPage() {
   const sync = useMutation({
     mutationFn: () => syncFn({ data: { from, to } }),
     onSuccess: (r) => {
-      toast.success(`Synced ${r.commits} commits and ${r.pullRequests} merged PRs.`);
+      const skipped = (r as { skipped?: string[] }).skipped ?? [];
+      toast.success(`Synced ${r.commits} commits and ${r.pullRequests} merged PRs.`, {
+        description: skipped.length
+          ? `Skipped ${skipped.length} repo(s) with no activity or access: ${skipped.slice(0, 3).join(", ")}${skipped.length > 3 ? "…" : ""}`
+          : undefined,
+      });
       qc.invalidateQueries();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -134,13 +139,13 @@ function RepositoriesPage() {
 
   return (
     <AppShell
-      title="Repositories"
-      description="Connect GitHub, choose the repositories worth mining, then sync your contributions."
+      title="Step 1 · Connect GitHub & sync"
+      description="Connect your account, tick the repositories worth mining, then pull your commits and merged pull requests. Empty or inaccessible repos are skipped automatically."
     >
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Github className="h-5 w-5" /> GitHub connection
+            <Github className="h-5 w-5" /> 1a · Connect your account
           </CardTitle>
           <CardDescription>
             {connected
@@ -193,7 +198,7 @@ function RepositoriesPage() {
       {connected ? (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">Sync window</CardTitle>
+            <CardTitle className="text-lg">1c · Pull your work</CardTitle>
             <CardDescription>Pull commits and merged PRs for the selected repositories.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap items-end gap-3">
@@ -215,7 +220,7 @@ function RepositoriesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Your repositories</CardTitle>
+          <CardTitle className="text-lg">1b · Choose repositories</CardTitle>
           <CardDescription>Tick the repositories to include in analysis.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-2">

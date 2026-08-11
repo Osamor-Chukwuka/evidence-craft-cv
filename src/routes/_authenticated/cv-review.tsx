@@ -136,12 +136,12 @@ function CvReviewPage() {
 
   return (
     <AppShell
-      title="CV review"
+      title="Step 3 · Compare your CV"
       description="Upload your current CV, compare it against your verified git history, then approve the suggestions worth keeping."
     >
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-lg">1 · Upload your CV</CardTitle>
+          <CardTitle className="text-lg">3a · Upload your CV</CardTitle>
           <CardDescription>
             PDF, plain text, or markdown. The text is extracted and structured — nothing is invented.
           </CardDescription>
