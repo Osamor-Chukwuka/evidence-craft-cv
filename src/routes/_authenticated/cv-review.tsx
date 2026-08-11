@@ -172,7 +172,7 @@ function CvReviewPage() {
 
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle className="text-lg">2 · Compare against your evidence</CardTitle>
+          <CardTitle className="text-lg">3b · Compare against your evidence</CardTitle>
           <CardDescription>
             Flags vague entries, work missing from your CV, and claims your git history does not support.
           </CardDescription>
@@ -190,7 +190,7 @@ function CvReviewPage() {
 
       <section className="space-y-4">
         <h2 className="text-sm uppercase tracking-wide text-muted-foreground">
-          3 · Review suggestions
+          3c · Review suggestions
         </h2>
 
         {gaps.isLoading ? (
