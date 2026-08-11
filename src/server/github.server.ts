@@ -29,9 +29,19 @@ async function gh<T>(token: string, path: string): Promise<T> {
   });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`GitHub request failed [${res.status}] ${path}: ${body.slice(0, 400)}`);
+    const error = new Error(
+      `GitHub request failed [${res.status}] ${path}: ${body.slice(0, 400)}`,
+    ) as Error & { status?: number };
+    error.status = res.status;
+    throw error;
   }
   return (await res.json()) as T;
+}
+
+/** 409 = empty repository, 404/403 = no access. None of these are real failures. */
+function isSkippableRepoError(error: unknown) {
+  const status = (error as { status?: number } | null)?.status;
+  return status === 409 || status === 404 || status === 403 || status === 451;
 }
 
 export function getViewer(token: string) {
