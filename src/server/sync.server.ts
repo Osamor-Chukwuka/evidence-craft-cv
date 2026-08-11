@@ -107,67 +107,75 @@ export async function runSync(userId: string, from: string, to: string) {
   const until = new Date(`${to}T23:59:59Z`).toISOString();
   let commitCount = 0;
   let prCount = 0;
+  const skipped: string[] = [];
 
   try {
     for (const repo of repos) {
-      const commits = await listCommits(token, repo.full_name, login, since, until);
-      const detailed = commits.slice(0, 60);
-      const rows = [];
-      for (const commit of detailed) {
-        let stats = { additions: 0, deletions: 0, files: 0, filenames: [] as string[] };
-        try {
-          stats = await getCommitStats(token, repo.full_name, commit.sha);
-        } catch {
-          /* stats are best effort */
+      try {
+        const commits = await listCommits(token, repo.full_name, login, since, until);
+        const detailed = commits.slice(0, 60);
+        const rows = [];
+        for (const commit of detailed) {
+          let stats = { additions: 0, deletions: 0, files: 0, filenames: [] as string[] };
+          try {
+            stats = await getCommitStats(token, repo.full_name, commit.sha);
+          } catch {
+            /* stats are best effort */
+          }
+          rows.push({
+            user_id: userId,
+            repository_id: repo.id,
+            kind: "commit" as const,
+            external_id: commit.sha,
+            title: (commit.message.split("\n")[0] ?? commit.message).slice(0, 300),
+            body: [commit.message, stats.filenames.join(", ")].filter(Boolean).join("\n\nFiles: "),
+            url: commit.url,
+            files_changed: stats.files,
+            additions: stats.additions,
+            deletions: stats.deletions,
+            occurred_at: commit.date,
+          });
         }
-        rows.push({
+        if (rows.length) {
+          const { error } = await db
+            .from("contributions")
+            .upsert(rows, { onConflict: "user_id,repository_id,kind,external_id" });
+          if (error) throw new Error(error.message);
+          commitCount += rows.length;
+        }
+
+        const pulls = await listMergedPulls(token, repo.full_name, login, since, until);
+        const prRows = pulls.map((pr) => ({
           user_id: userId,
           repository_id: repo.id,
-          kind: "commit" as const,
-          external_id: commit.sha,
-          title: (commit.message.split("\n")[0] ?? commit.message).slice(0, 300),
-          body: [commit.message, stats.filenames.join(", ")].filter(Boolean).join("\n\nFiles: "),
-          url: commit.url,
-          files_changed: stats.files,
-          additions: stats.additions,
-          deletions: stats.deletions,
-          occurred_at: commit.date,
-        });
-      }
-      if (rows.length) {
-        const { error } = await db
-          .from("contributions")
-          .upsert(rows, { onConflict: "user_id,repository_id,kind,external_id" });
-        if (error) throw new Error(error.message);
-        commitCount += rows.length;
-      }
+          kind: "pull_request" as const,
+          external_id: String(pr.number),
+          title: pr.title.slice(0, 300),
+          body: pr.body?.slice(0, 4000) ?? null,
+          url: pr.url,
+          files_changed: pr.changedFiles,
+          additions: pr.additions,
+          deletions: pr.deletions,
+          occurred_at: pr.mergedAt,
+        }));
+        if (prRows.length) {
+          const { error } = await db
+            .from("contributions")
+            .upsert(prRows, { onConflict: "user_id,repository_id,kind,external_id" });
+          if (error) throw new Error(error.message);
+          prCount += prRows.length;
+        }
 
-      const pulls = await listMergedPulls(token, repo.full_name, login, since, until);
-      const prRows = pulls.map((pr) => ({
-        user_id: userId,
-        repository_id: repo.id,
-        kind: "pull_request" as const,
-        external_id: String(pr.number),
-        title: pr.title.slice(0, 300),
-        body: pr.body?.slice(0, 4000) ?? null,
-        url: pr.url,
-        files_changed: pr.changedFiles,
-        additions: pr.additions,
-        deletions: pr.deletions,
-        occurred_at: pr.mergedAt,
-      }));
-      if (prRows.length) {
-        const { error } = await db
-          .from("contributions")
-          .upsert(prRows, { onConflict: "user_id,repository_id,kind,external_id" });
-        if (error) throw new Error(error.message);
-        prCount += prRows.length;
-      }
+        if (!rows.length && !prRows.length) skipped.push(repo.full_name);
 
-      await db
-        .from("repositories")
-        .update({ last_synced_at: new Date().toISOString() })
-        .eq("id", repo.id);
+        await db
+          .from("repositories")
+          .update({ last_synced_at: new Date().toISOString() })
+          .eq("id", repo.id);
+      } catch {
+        // one bad repository (empty, moved, or no access) must not fail the whole sync
+        skipped.push(repo.full_name);
+      }
     }
 
     if (run) {
@@ -176,7 +184,7 @@ export async function runSync(userId: string, from: string, to: string) {
         .update({ status: "completed", commits_count: commitCount, prs_count: prCount })
         .eq("id", run.id);
     }
-    return { commits: commitCount, pullRequests: prCount, repos: repos.length };
+    return { commits: commitCount, pullRequests: prCount, repos: repos.length, skipped };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Sync failed";
     if (run) {
