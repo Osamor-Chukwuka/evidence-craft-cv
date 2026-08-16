@@ -44,6 +44,7 @@ type AnalysisSummary = {
   analyzed: number;
   selected: number;
   skipped: string[];
+  message?: string;
 };
 
 function asArray(value: unknown): string[] {
@@ -92,14 +93,19 @@ export default function AchievementsPage() {
   const run = useMutation({
     mutationFn: (repositoryId: string) => analyzeRepoAction({ repositoryId }),
     onSuccess: (result) => {
+      const message =
+        ("message" in result && typeof result.message === "string" ? result.message : null) ??
+        "No synced commits or merged PRs were found for this repository. Sync work for it first, then analyze again.";
       setAnalysisError(null);
       setAnalysisSummary({
         created: result.created,
-        analyzed: 1,
+        analyzed: result.created ? 1 : 0,
         selected: 1,
         skipped: [],
+        ...(result.created ? {} : { message }),
       });
-      toast.success(`Generated ${result.created} work items.`);
+      if (result.created) toast.success(`Generated ${result.created} work items.`);
+      else toast.info(message);
       qc.invalidateQueries({ queryKey: ["achievements"] });
       qc.invalidateQueries({ queryKey: ["journey-counts"] });
     },
@@ -113,9 +119,18 @@ export default function AchievementsPage() {
   const runAll = useMutation({
     mutationFn: () => analyzeSelectedReposAction(),
     onSuccess: (result) => {
+      const message =
+        ("message" in result && typeof result.message === "string" ? result.message : null) ??
+        "No synced commits or merged PRs were found in the selected repositories. Sync recent work first, then analyze again.";
       setAnalysisError(null);
       setAnalysisSummary(result);
-      toast.success(`Generated ${result.created} work items from ${result.analyzed} repositories.`);
+      if (result.created) {
+        toast.success(
+          `Generated ${result.created} work items from ${result.analyzed} repositories.`,
+        );
+      } else {
+        toast.info(message);
+      }
       qc.invalidateQueries({ queryKey: ["achievements"] });
       qc.invalidateQueries({ queryKey: ["journey-counts"] });
     },
@@ -207,13 +222,23 @@ export default function AchievementsPage() {
           ) : null}
 
           {analysisSummary ? (
-            <Alert className="border-primary/40 bg-primary/5">
-              <Check className="h-4 w-4" />
-              <AlertTitle>Evidence pass complete</AlertTitle>
+            <Alert
+              className={cn(
+                analysisSummary.created ? "border-primary/40 bg-primary/5" : "bg-surface",
+              )}
+            >
+              {analysisSummary.created ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <AlertCircle className="h-4 w-4" />
+              )}
+              <AlertTitle>
+                {analysisSummary.created ? "Evidence pass complete" : "No work found to analyze"}
+              </AlertTitle>
               <AlertDescription>
-                Generated {analysisSummary.created} work items from {analysisSummary.analyzed} of{" "}
-                {analysisSummary.selected} selected repositories.
-                {analysisSummary.skipped.length
+                {analysisSummary.message ??
+                  `Generated ${analysisSummary.created} work items from ${analysisSummary.analyzed} of ${analysisSummary.selected} selected repositories.`}
+                {analysisSummary.created && analysisSummary.skipped.length
                   ? ` ${analysisSummary.skipped.length} repo(s) had no usable synced work.`
                   : ""}
               </AlertDescription>

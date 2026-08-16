@@ -11,6 +11,7 @@ const INTERNAL_AI_PATTERNS = [
   "Empty AI response",
   "request failed",
   "All AI providers failed",
+  "Minified React error #441",
 ];
 
 export function getAnalysisErrorMessage(error: Error) {

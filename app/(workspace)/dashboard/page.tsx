@@ -36,6 +36,10 @@ export default function DashboardPage() {
   });
 
   const queue = steps.filter((step) => !step.done);
+  const nextAction =
+    current.to === "/dashboard"
+      ? (steps.find((step) => step.id === "sources") ?? current)
+      : current;
 
   return (
     <AppShell
@@ -43,8 +47,8 @@ export default function DashboardPage() {
       description="Start wherever the workspace has enough proof to move. Sources, evidence, CV gaps, and final CV versions stay separate so the flow feels honest."
       actions={
         <Button asChild size="lg" className="min-h-11 w-full sm:w-auto">
-          <Link href={current.to}>
-            Continue: {current.label} <ArrowRight className="ml-2 h-4 w-4" />
+          <Link href={nextAction.to}>
+            Continue: {nextAction.label} <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>
       }

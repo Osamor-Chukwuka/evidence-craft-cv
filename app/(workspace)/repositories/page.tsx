@@ -222,8 +222,8 @@ export default function RepositoriesPage() {
       description="Connect GitHub, choose the repositories that contain relevant work, then sync commits and merged PRs for the period you want to turn into evidence."
     >
       <div className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,360px)]">
-        <div className="min-w-0 space-y-4">
-          <Card>
+        <div className="contents">
+          <Card className="order-1 min-w-0 lg:col-start-1 lg:row-start-1">
             <CardHeader>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -308,7 +308,7 @@ export default function RepositoriesPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="order-3 min-w-0 lg:col-start-1 lg:row-start-2">
             <CardHeader>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -438,7 +438,7 @@ export default function RepositoriesPage() {
           </Card>
         </div>
 
-        <aside className="min-w-0 space-y-4 lg:sticky lg:top-4 lg:self-start">
+        <aside className="order-2 min-w-0 space-y-4 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-4 lg:self-start">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

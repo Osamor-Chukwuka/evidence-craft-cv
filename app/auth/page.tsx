@@ -5,17 +5,12 @@ import { GitBranch } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import {
-  setSupabaseSessionAction,
-  signInWithPasswordAction,
-  signUpWithPasswordAction,
-} from "@/actions/auth";
+import { signInWithPasswordAction, signUpWithPasswordAction } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { lovable } from "@/integrations/lovable";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -56,29 +51,6 @@ export default function AuthPage() {
     router.refresh();
   };
 
-  const google = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in failed. Please try again.");
-      return;
-    }
-    if (result.redirected) return;
-    if ("tokens" in result && result.tokens?.access_token && result.tokens?.refresh_token) {
-      const session = await setSupabaseSessionAction({
-        accessToken: result.tokens.access_token,
-        refreshToken: result.tokens.refresh_token,
-      });
-      if (!session.ok) {
-        toast.error(session.message);
-        return;
-      }
-    }
-    router.replace("/dashboard");
-    router.refresh();
-  };
-
   return (
     <main className="auth-backdrop flex min-h-dvh items-center justify-center bg-background px-4 py-10 text-foreground">
       <Card className="w-full max-w-md min-w-0 border-border shadow-sm">
@@ -94,16 +66,7 @@ export default function AuthPage() {
             Sign in to connect GitHub, review recovered work, and build your evidence-backed CV.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="secondary" className="min-h-11 w-full" onClick={google}>
-            Continue with Google
-          </Button>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />
-            or use email
-            <span className="h-px flex-1 bg-border" />
-          </div>
-
+        <CardContent>
           <Tabs defaultValue="signin">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign in</TabsTrigger>
